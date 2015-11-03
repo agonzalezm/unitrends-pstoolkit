@@ -34,6 +34,7 @@
   <ItemGroup>
     <Compile Include="Init.ps1" />
     <Compile Include="Modules\Get-UebAlert.ps1" />
+    <Compile Include="Modules\Get-UebApi.ps1" />
     <Compile Include="Modules\Get-UebJob.ps1" />
     <Compile Include="Modules\Get-UebVirtualClient.ps1" />
     <Compile Include="Modules\Helper.ps1" />
