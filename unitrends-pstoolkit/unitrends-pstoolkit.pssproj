@@ -33,6 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Init.ps1" />
+    <Compile Include="Modules\Disable-UebJob.ps1" />
+    <Compile Include="Modules\Enable-UebJob.ps1" />
     <Compile Include="Modules\Get-UebAlert.ps1" />
     <Compile Include="Modules\Get-UebApi.ps1" />
     <Compile Include="Modules\Get-UebJob.ps1" />
