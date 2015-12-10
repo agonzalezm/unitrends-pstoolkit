@@ -6,7 +6,6 @@ function Get-UebAlert {
 
 	$obj = $response.data
 	$prop = @('sname','severity','created','message')
-	$type = "UebAlert"
 
-	FormatUebResult $obj $type $prop
+	FormatUebResult $obj $prop
 }

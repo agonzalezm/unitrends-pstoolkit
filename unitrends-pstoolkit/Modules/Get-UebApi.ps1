@@ -7,6 +7,6 @@ function Get-UebApi {
 	CheckConnection
 	$response = UebGet($uri)
 
-	$obj = $response.data
+	$obj = $response
 	$obj
 }

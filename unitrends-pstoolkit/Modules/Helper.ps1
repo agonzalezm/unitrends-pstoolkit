@@ -58,16 +58,15 @@ function Set-PSObjectDefaultProperties {
 
 function FormatUebResult{
 	param(
-		[object[]] $obj, 
-		[string] $type, 
+		[object[]] $obj,  
 		[object[]] $prop )
 
 	if($obj) {
 		$obj|%{
-			$_.psTypeNames.Insert(0, $type)
+			$_.psTypeNames.Insert(0, "UebObject")
 		}
 	
-		Update-TypeData -Force -TypeName $type -DefaultDisplayPropertySet $prop
+		Update-TypeData -Force -TypeName "UebObject" -DefaultDisplayPropertySet $prop
 		$obj
 	}
 }

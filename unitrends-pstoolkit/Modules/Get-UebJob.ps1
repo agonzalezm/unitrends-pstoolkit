@@ -17,13 +17,11 @@ function Get-UebJob {
 
 		$obj = $response.data | Where-Object { $_.status -notmatch "Successful"}
 		$prop = @('name','status','percent_complete','instance_name')
-		$type = "UebJob"
 	} elseif($Recent){
 		$response = UebGet("api/jobs/history")
 
 		$obj = $response.data
 		$prop = @('name','status','type','start_date')
-		$type = "UebJobHistory"
 	} else {	
 		$response = UebGet("api/joborders")
 
@@ -33,8 +31,7 @@ function Get-UebJob {
 		}
 
 		$prop = @('name','type','last_status','status')
-		$type = "UebJob"
 	}
 
-	FormatUebResult $obj $type $prop
+	FormatUebResult $obj $prop
 }
