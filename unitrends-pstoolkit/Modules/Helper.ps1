@@ -13,13 +13,16 @@ function UebGet {
 
 function UebPost {
 	param ([string] $api, $body)
-	Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Post -Body (ConvertTo-Json -InputObject $body) 
+	Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Post -Body (ConvertTo-Json -InputObject $body -Depth 10) 
 }
 
 function UebPut {
 	param ([string] $api, $body)
-	#Invoke-RestMethod -UseBasicParsing -Uri "https://$global:UebServer/$api" -Method Put -Body (ConvertTo-Json -InputObject $body) 
-	Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Put -Headers $global:UebAuthHeader
+	if($body -ne $null){
+		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Put -Headers $global:UebAuthHeader -Body (ConvertTo-Json -InputObject $body -Depth 10) 
+	} else {
+		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Put -Headers $global:UebAuthHeader
+	}
 }
 
 function UebDelete {
