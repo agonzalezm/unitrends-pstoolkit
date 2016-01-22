@@ -33,15 +33,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Init.ps1" />
+    <Compile Include="Modules\Add-UebJobVm.ps1" />
     <Compile Include="Modules\Disable-UebJob.ps1" />
     <Compile Include="Modules\Enable-UebJob.ps1" />
     <Compile Include="Modules\Get-UebAlert.ps1" />
     <Compile Include="Modules\Get-UebApi.ps1" />
+    <Compile Include="Modules\Get-UebBackup.ps1" />
+    <Compile Include="Modules\Get-UebBackupSummary.ps1" />
+    <Compile Include="Modules\Get-UebCatalog.ps1" />
+    <Compile Include="Modules\Get-UebFlr.ps1" />
+    <Compile Include="Modules\Get-UebInventory.ps1" />
     <Compile Include="Modules\Get-UebJob.ps1" />
     <Compile Include="Modules\Get-UebVirtualClient.ps1" />
     <Compile Include="Modules\Helper.ps1" />
+    <Compile Include="Modules\Remove-UebJobVm.ps1" />
+    <Compile Include="Modules\Start-UebFlr.ps1" />
     <Compile Include="Modules\Start-UebJob.ps1" />
+    <Compile Include="Modules\Stop-UebFlr.ps1" />
     <Compile Include="Modules\Stop-UebJob.ps1" />
+    <Compile Include="Modules\Sync-UebInventory.ps1" />
     <Compile Include="Tests\Sample.ps1" />
     <Compile Include="Unitrends.psd1" />
     <Compile Include="Modules\Connect-UebServer.ps1" />
