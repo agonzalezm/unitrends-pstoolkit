@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Modules\" />
+    <Folder Include="Scripts\" />
     <Folder Include="Tests\" />
   </ItemGroup>
   <ItemGroup>
@@ -43,15 +44,20 @@
     <Compile Include="Modules\Get-UebCatalog.ps1" />
     <Compile Include="Modules\Get-UebFlr.ps1" />
     <Compile Include="Modules\Get-UebInventory.ps1" />
+    <Compile Include="Modules\Get-UebIr.ps1" />
     <Compile Include="Modules\Get-UebJob.ps1" />
     <Compile Include="Modules\Get-UebVirtualClient.ps1" />
     <Compile Include="Modules\Helper.ps1" />
     <Compile Include="Modules\Remove-UebJobVm.ps1" />
     <Compile Include="Modules\Start-UebFlr.ps1" />
+    <Compile Include="Modules\Start-UebIr.ps1" />
     <Compile Include="Modules\Start-UebJob.ps1" />
     <Compile Include="Modules\Stop-UebFlr.ps1" />
+    <Compile Include="Modules\Stop-UebIr.ps1" />
     <Compile Include="Modules\Stop-UebJob.ps1" />
     <Compile Include="Modules\Sync-UebInventory.ps1" />
+    <Compile Include="Scripts\Get-UebBackupRto.ps1" />
+    <Compile Include="Scripts\RecoveryPlan_1.ps1" />
     <Compile Include="Tests\Sample.ps1" />
     <Compile Include="Unitrends.psd1" />
     <Compile Include="Modules\Connect-UebServer.ps1" />
