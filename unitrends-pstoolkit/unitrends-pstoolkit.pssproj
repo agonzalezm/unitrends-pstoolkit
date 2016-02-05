@@ -56,6 +56,7 @@
     <Compile Include="Modules\Stop-UebIr.ps1" />
     <Compile Include="Modules\Stop-UebJob.ps1" />
     <Compile Include="Modules\Sync-UebInventory.ps1" />
+    <Compile Include="Scripts\check_unitrends.ps1" />
     <Compile Include="Scripts\Get-UebBackupRto.ps1" />
     <Compile Include="Scripts\RecoveryPlan_1.ps1" />
     <Compile Include="Tests\Sample.ps1" />

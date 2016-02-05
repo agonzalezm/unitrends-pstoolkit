@@ -1,7 +1,7 @@
 function Get-UebBackupSummary {
 	[CmdletBinding()]
 	param(
-
+        [string]$rpo = 24
 	)
 
 	CheckConnection
@@ -11,7 +11,7 @@ function Get-UebBackupSummary {
 	
 	[array]$vmlist = $null
 	$date = Get-Date
-    $rpo = New-TimeSpan -Hours 24
+    $rpo = New-TimeSpan -Hours $rpo
 
 	foreach($i in $instances){
 		$lastbackup = $i.backups | Sort-Object -Property start_date -Descending | Select-Object -First 1
