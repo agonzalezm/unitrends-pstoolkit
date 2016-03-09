@@ -1,5 +1,7 @@
 #Powershell Cmdlets for Unitrends UEB
 
+[![Join the chat at https://gitter.im/Unitrends/unitrends-pstoolkit](https://badges.gitter.im/Unitrends/unitrends-pstoolkit.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **WARNING: These community scripts are “as is” & are not officially supported by Unitrends.**
 
 **Request new features or report bugs:**
