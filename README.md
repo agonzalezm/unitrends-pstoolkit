@@ -1,3 +1,5 @@
+Join our online chat at [![Gitter](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit)
+
 #Powershell Cmdlets for Unitrends UEB
 
 **WARNING: These community scripts are “as is” & are not officially supported by Unitrends.**
