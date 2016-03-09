@@ -1,6 +1,19 @@
-Join our online chat at [![Gitter](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit)
+Chat Room
+---------
 
-#Powershell Cmdlets for Unitrends UEB
+Want to chat with other members of the Unitrends community?
+
+[![Join the chat at https://gitter.im/dotnet/coreclr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit)
+
+Engage, Contribute and Provide Feedback
+---------------------------------------
+
+Some of the best ways to contribute are to try things out, file bugs, and join in gitter conversations. You are encouraged to start a discussion by filing an issue. 
+
+Looking for something to work on? The list of [issues](https://github.com/Unitrends/unitrends-pstoolkit/issues) is a great place to start.
+
+Download and getting started
+---------------------------------------
 
 **WARNING: These community scripts are “as is” & are not officially supported by Unitrends.**
 
