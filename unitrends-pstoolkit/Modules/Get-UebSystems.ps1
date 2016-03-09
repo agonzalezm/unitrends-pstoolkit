@@ -24,9 +24,7 @@ function Get-UebSystems {
 			$obj = $obj | Where-Object { $_.local -like "True" }
 		}
         
-		$prop = @('id','is_pending','request_id','name','host','asset_tag','role',
-			'version','version_status','local','total_mb_size','total_mb_free',
-			'archiving','replicating','online','status','message','created','updated')
+		$prop = @('name','host','role','status')
          
 		FormatUebResult $obj $prop
 	}
