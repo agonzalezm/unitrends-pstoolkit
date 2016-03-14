@@ -3,7 +3,7 @@ Chat Room
 
 Want to chat with other members of the Unitrends community?
 
-[![Join the chat at https://gitter.im/dotnet/coreclr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit)
+[![Join the chat at https://gitter.im/Unitrends/unitrends-pstoolkit](https://badges.gitter.im/Unitrends/unitrends-pstoolkit.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Engage, Contribute and Provide Feedback
 ---------------------------------------
@@ -14,8 +14,6 @@ Looking for something to work on? The list of [issues](https://github.com/Unitre
 
 Download and getting started
 ---------------------------------------
-
-[![Join the chat at https://gitter.im/Unitrends/unitrends-pstoolkit](https://badges.gitter.im/Unitrends/unitrends-pstoolkit.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **WARNING: These community scripts are “as is” & are not officially supported by Unitrends.**
 
