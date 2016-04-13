@@ -35,8 +35,11 @@
   <ItemGroup>
     <Compile Include="Init.ps1" />
     <Compile Include="Modules\Add-UebJobVm.ps1" />
+    <Compile Include="Modules\Add-UebStorage.ps1" />
     <Compile Include="Modules\Disable-UebJob.ps1" />
+    <Compile Include="Modules\Disable-UebStorage.ps1" />
     <Compile Include="Modules\Enable-UebJob.ps1" />
+    <Compile Include="Modules\Enable-UebStorage.ps1" />
     <Compile Include="Modules\Get-UebAlert.ps1" />
     <Compile Include="Modules\Get-UebApi.ps1" />
     <Compile Include="Modules\Get-UebBackup.ps1" />
@@ -46,9 +49,12 @@
     <Compile Include="Modules\Get-UebInventory.ps1" />
     <Compile Include="Modules\Get-UebIr.ps1" />
     <Compile Include="Modules\Get-UebJob.ps1" />
+    <Compile Include="Modules\Get-UebStorage.ps1" />
+    <Compile Include="Modules\Get-UebSystems.ps1" />
     <Compile Include="Modules\Get-UebVirtualClient.ps1" />
     <Compile Include="Modules\Helper.ps1" />
     <Compile Include="Modules\Remove-UebJobVm.ps1" />
+    <Compile Include="Modules\Remove-UebStorage .ps1" />
     <Compile Include="Modules\Start-UebFlr.ps1" />
     <Compile Include="Modules\Start-UebIr.ps1" />
     <Compile Include="Modules\Start-UebJob.ps1" />
