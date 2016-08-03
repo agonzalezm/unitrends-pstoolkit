@@ -24,7 +24,7 @@ Download and getting started
 **Download and install:**
 
 1. Open Powershell as Administrator and allow execution of unsigned scripts by running command: Set-ExecutionPolicy Bypass
-2. Run commmand:
+2. Run commmand:  
 ``` iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 -UseBasicParsing | iex ```
 
 **Usage:**
