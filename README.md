@@ -50,3 +50,10 @@ Download and getting started
 **Update:**
 
 Once installed you can update to last version using Cmdlet Update-UebPsToolkit
+
+**Help:**
+
+You can list all available cmdlets using:
+
+PS C:\> Get-Uebhelp
+
