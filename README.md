@@ -53,37 +53,7 @@ Once installed you can update to last version using Cmdlet Update-UebPsToolkit
 
 **Help:**
 
-PS C:\> Get-Uebhelp
+You can list all available cmdlets using:
 
-Unitrends Cmdlets
------------------
-Add-UebJobVm
-Add-UebStorage
-Connect-UebServer
-Disable-UebJob
-Disable-UebStorage
-Enable-UebJob
-Enable-UebStorage
-Get-UebAlert
-Get-UebApi
-Get-UebBackup
-Get-UebBackupSummary
-Get-UebCatalog
-Get-UebFlr
-Get-UebInventory
-Get-UebIr
-Get-UebJob
-Get-UebStorage
-Get-UebSystems
-Get-UebVirtualClient
-Remove-UebJobVm
-Remove-UebStorage
-Start-UebFlr
-Start-UebIr
-Start-UebJob
-Stop-UebFlr
-Stop-UebIr
-Stop-UebJob
-Sync-UebInventory
-Update-UebPsToolkit
+PS C:\> Get-Uebhelp
 
