@@ -3,6 +3,7 @@ Write-Host "[*] Welcome to Unitrends Powershell Toolkit! -----------------------
 Write-Host ""
 Write-Host "    Sample usage:"
 Write-Host ""
+Write-Host "            Get-UebHelp"
 Write-Host "            Connect-UebServer -Server ueb01 -User root -Password yourpass"
 Write-Host "            Get-UebJob"
 Write-Host "            Get-UebJob -Active"
