@@ -47,3 +47,6 @@ Download and getting started
 
     Copyright (C) Unitrends,Inc. All rights reserved.
 
+**Update:**
+
+Once installed you can update to last version using Cmdlet Update-UebPsToolkit
