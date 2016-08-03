@@ -23,20 +23,16 @@ Download and getting started
 
 **Download and install:**
 
-1. Download last version from <a href="https://github.com/unitrends/unitrends-pstoolkit/archive/master.zip"> here</a>
-2. Unzip to a folder
-3. Open Powershell as Administrator and allow execution of unsigned scripts by running command: Set-ExecutionPolicy Bypass
-4. Cd to unzipped folder and run .\Init.ps1 to load module
+1. Open Powershell as Administrator and allow execution of unsigned scripts by running command: Set-ExecutionPolicy Bypass
+2. Run commmand: 
+    PS> iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 -UseBasicParsing | iex
 
 **Usage:**
 
-
-
-    PS E:\unitrends-pstoolkit-master\unitrends-pstoolkit> .\Init.ps1
+    PS> Import-Module Unitrends
       [*] Welcome to Unitrends Powershell Toolkit! ---------------------------------------------------------
       
-    Sample usage:
-    
+    Sample usage:   
 
             Connect-UebServer -Server ueb01 -User root -Password yourpass
             Get-UebJob
