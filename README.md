@@ -57,11 +57,12 @@ You can list all available cmdlets using:
 
 PS C:\> Get-Uebhelp
 
+** Blogs articles about Unitrends PsToolkit:**
 
-[issues](http://blogs.unitrends.com/unitrends-powershell-toolkit/)  
-http://blogs.unitrends.com/create-powershell-cmdlets/
-http://blogs.unitrends.com/automating-backup-protection-virtual-machines-using-powershell/
-http://blogs.unitrends.com/rpo-rpa-measure-rpo-compliance-backups-using-powershell/
-http://blogs.unitrends.com/automate-multiple-instant-recoveries-backups-using-powershell/
-http://blogs.unitrends.com/rtorta-measure-rto-compliance-backups-using-powershell/
+[Unitrends PowerShell Toolkit](http://blogs.unitrends.com/unitrends-powershell-toolkit/)  
+[How to create your own Powershell Cmdlets](http://blogs.unitrends.com/create-powershell-cmdlets/)  
+[Automating backup protection of Virtual Machines using Powershell](http://blogs.unitrends.com/automating-backup-protection-virtual-machines-using-powershell/)  
+[RPO, RPA: How to measure RPO compliance of your backups using Powershell](http://blogs.unitrends.com/rpo-rpa-measure-rpo-compliance-backups-using-powershell/)  
+[Automate multiple Instant Recoveries from your backups using Powershell](http://blogs.unitrends.com/automate-multiple-instant-recoveries-backups-using-powershell/)  
+[TO/RTA: How to measure RTO compliance of your backups using Powershell](http://blogs.unitrends.com/rtorta-measure-rto-compliance-backups-using-powershell/)  
 
