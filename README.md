@@ -1,3 +1,5 @@
+**WARNING: These community scripts are “as is” & are not officially supported by Unitrends.**
+
 Chat Room
 ---------
 
@@ -12,14 +14,13 @@ Some of the best ways to contribute are to try things out, file bugs, and join i
 
 Looking for something to work on? The list of [issues](https://github.com/Unitrends/unitrends-pstoolkit/issues) is a great place to start.
 
-Download and getting started
----------------------------------------
-
-**WARNING: These community scripts are “as is” & are not officially supported by Unitrends.**
-
 **Request new features or report bugs:**
 
-1. Open github issue
+1. Open github [issue](https://github.com/Unitrends/unitrends-pstoolkit/issues)
+
+
+Download and getting started
+---------------------------------------
 
 **Download and install:**
 
