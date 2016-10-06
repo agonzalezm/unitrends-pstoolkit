@@ -1,4 +1,4 @@
-function Get-UebBackupSummary1 {
+function Get-UebBackupSummary {
 	[CmdletBinding()]
 	param(
         [string]$rpo = 24
@@ -32,7 +32,7 @@ function Get-UebBackupSummary1 {
             	
 
 		$Object = New-Object PSObject -Property @{ 
-			VM = $thisname
+			Asset = $thisname
 			Backups = $i.backups.count
 			RPO_Compliance = $rpo_compliance
 			RPA = "$($rpa.days)d $($rpa.hours)h"
