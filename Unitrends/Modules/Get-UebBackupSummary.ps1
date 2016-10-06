@@ -28,10 +28,10 @@ function Get-UebBackupSummary {
 		$backup_date = [datetime] $lastbackup.start_date
 		$rpa = New-TimeSpan -Start $backup_date -End $date	
         $thisName = $i.database_name
-        if ($i.app_type -eq "Physical Server"){
+        if ($i.app_type -eq "Physical Server"){ # Changes where Asset detail is pulled from depending on App_Type. Resembles the GUI more closely.
             $thisname =  $i.client_name
         }
-        # Need a if statement to alter the "VM" name if this is a physical machine
+        
 
 
         if($rpa -le $rpo) {
