@@ -1,3 +1,13 @@
+<#
+.Synopsis
+   Gets Backup Summary list from connected Unitrends Appliance
+.DESCRIPTION
+   This cmdlet returns a list of Backup Assets and summarized details from the connected Unitrends Appliance. Use "Connect-UebServer" to connect.
+.EXAMPLE
+   Get-UebBackupSummary
+.EXAMPLE
+   Get-UebBackupSummary | Where-Object {$_.type -match "Physical Server"} #Filters list to Physical Servers
+#>
 function Get-UebBackupSummary {
 	[CmdletBinding()]
 	param(
