@@ -20,8 +20,9 @@ $destination.Copyhere($zip_file.items(), 0x10)
 ##Install
 
 Write-Host "Installing latest version of Unitrends PSToolkit ..." -ForegroundColor Cyan
-$item = $targetondisk + "\unitrends-pstoolkit-master\Unitrends\"
-$destination = "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\Unitrends"
+$item = $targetondisk + "\unitrends-pstoolkit-master\Unitrends\*"
+$destination = "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\Unitrends\"
+New-Item -ItemType Directory -Force -Path $destination
 cpi $item -Destination $destination -Recurse -Force
 
 
