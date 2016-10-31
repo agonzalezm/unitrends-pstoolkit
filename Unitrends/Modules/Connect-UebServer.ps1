@@ -21,8 +21,13 @@
    Connect-UebServer -Server 192.168.1.100 -Credential (Get-Credential)
 #>
 function Connect-UebServer {
-	[CmdletBinding()]
+	[CmdletBinding(
+
+        DefaultParameterSetName=”PSCred”
+
+    )]
 	param (
+
 		[Parameter(Mandatory=$true,Position=0)]
 		[string] $Server,
         [Parameter(Mandatory=$true,Position=1, ParameterSetName="UserPass")]
@@ -62,5 +67,7 @@ function Connect-UebServer {
 	$global:UebServer = $server
 	$global:UebAuthHeader =  @{
 		AuthToken=$response.auth_token;
+
 	}
+
 }
