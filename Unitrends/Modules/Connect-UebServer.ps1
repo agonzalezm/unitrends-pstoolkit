@@ -10,22 +10,23 @@
 .PARAMETER Password
    Unitrends Appliance Password
 .EXAMPLE
-   Connect-UebServer -Server 192.168.1.100 -username root -password 12345
+   Connect-UebServer -Server 192.168.1.100 -Credential 'domain\user'
+.EXAMPLE
+   Connect-UebServer -Server 192.168.1.100 -Credential $cred
 #>
 function Connect-UebServer {
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory=$true,Position=0)]
 		[string] $Server,
-		[Parameter(Mandatory=$true,Position=1)]
-		[string] $User,
-		[Parameter(Mandatory=$true,Position=2)]
-        [string] $Password
+        [Parameter(Mandatory=$true,Position=1)]
+		[System.Management.Automation.CredentialAttribute()] $Credential
+
 	)
 
 	$body =  @{
-		username=$User;
-		password=$Password;
+		username=$Credential.UserName;
+		password=$Credential.GetNetworkCredential().Password;
 	}
 
 	$response = Invoke-RestMethod -Uri "https://$Server/api/login" -Method Post -Body (ConvertTo-Json -InputObject $body)
@@ -36,5 +37,3 @@ function Connect-UebServer {
 		AuthToken=$response.auth_token;
 	}
 }
-
-
