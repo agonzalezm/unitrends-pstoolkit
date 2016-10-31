@@ -17,15 +17,14 @@ function Connect-UebServer {
 	param (
 		[Parameter(Mandatory=$true,Position=0)]
 		[string] $Server,
-		[Parameter(Mandatory=$true,Position=1)]
-		[string] $User,
-		[Parameter(Mandatory=$true,Position=2)]
-        [string] $Password
+        [Parameter(Mandatory=$true,Position=1)]
+		[System.Management.Automation.CredentialAttribute()] $Credential
+
 	)
 
 	$body =  @{
-		username=$User;
-		password=$Password;
+		username=$Credential.UserName;
+		password=$Credential.GetNetworkCredential().Password;
 	}
 
 	$response = Invoke-RestMethod -Uri "https://$Server/api/login" -Method Post -Body (ConvertTo-Json -InputObject $body)
@@ -36,5 +35,3 @@ function Connect-UebServer {
 		AuthToken=$response.auth_token;
 	}
 }
-
-
