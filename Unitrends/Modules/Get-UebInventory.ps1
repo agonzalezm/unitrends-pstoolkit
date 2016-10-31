@@ -34,7 +34,7 @@ function Get-UebInventory {
 		{
 			$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
 			$vms += $node
-        }
+		}
 	}
 	
 	if($Name) {
