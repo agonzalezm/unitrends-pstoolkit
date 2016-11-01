@@ -18,7 +18,7 @@ function Add-UebJobVm {
         if($VM -is [String]) {
             $addvm =  Get-UebInventory.ps1 -Name $VM
 		}
-		$vmidstr = $addvm.id.split("_")[-1]
+		$vmidstr = ([string]$addvm.id -split("_"))[-1]
 
 		[int]$vmid = [convert]::ToInt32($vmidstr, 10)
 		
