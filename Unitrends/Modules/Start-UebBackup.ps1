@@ -46,9 +46,18 @@ Function Start-UebBackup {
             }
         }
         Else{
-            $instanceObjects.Add($instance) | Out-Null
+            $object = Get-UebInventory -Id $instance | Select-Object -First 1
+
+            If($object){           
+                $instanceObjects.Add($object) | Out-Null
+            }
+            Else{
+                Write-Warning -Message "Unable to find $instance in the UEB inventory. Skipping it for now."
+            }
         }
     }
+
+    
 
     If($instanceObjects.Count -eq 0){
         Write-Error -Message "There were no valid instances passed. Unable to continue"

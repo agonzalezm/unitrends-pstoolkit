@@ -1,7 +1,10 @@
 function Get-UebInventory {
 	param(
 		[Parameter(Mandatory=$false)]
-		[string] $Name
+		[string] $Name,
+		[Parameter(Mandatory=$false)]
+		[string] $Id
+
 	)
 
 	CheckConnection
@@ -39,6 +42,10 @@ function Get-UebInventory {
 	
 	if($Name) {
 		$vms= $vms | Where-Object { $_.name -like $Name }
+	}
+
+	if($Id) {
+		$vms= $vms | Where-Object { $_.id -like $Id }
 	}
 	
 	$prop = @('name','server')
