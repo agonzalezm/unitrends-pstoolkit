@@ -48,6 +48,6 @@ function Get-UebInventory {
 		$vms= $vms | Where-Object { $_.id -like $Id }
 	}
 	
-	$prop = @('name','server')
+	$prop = @('id','name','server')
 	FormatUebResult $vms $prop
 }
