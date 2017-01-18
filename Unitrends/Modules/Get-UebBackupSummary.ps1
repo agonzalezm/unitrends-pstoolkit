@@ -58,7 +58,7 @@ function Get-UebBackupSummary {
 	$instances = $response.catalog.instances
 	
 	[array]$vmlist = $null
-	$date = Get-Date
+	[datetime] $date = Get-Date
     $rpo = New-TimeSpan -Hours $rpo
 
 	foreach($i in $instances){
