@@ -1,12 +1,19 @@
+########################################################################################
+## To see what this looks like: https://s24.postimg.org/vjp7cydut/Unitrends_Slack.jpg ##
+########################################################################################
+
+
 #Get some info
 
 $ueb = "<YOUR_UEB_HOSTNAME_OR_IP>"
 $SlackToken = "<YOUR_SLACK_TOKEN>"
 
+
 ##Connect to the UEB
 
 Import-Module Unitrends
 Connect-UebServer -Server $ueb -User root -Password P@ssw0rd1
+
 
 ##Get failed jobs
 
@@ -16,18 +23,16 @@ $results = (Get-UebJob -Recent).backups | Where-Object { ($_.start_time -gt $dat
 
 foreach ($result in $results) {
 
-$assetname = $result.asset_name
-$assetid = $result.instance_id
-$backupid = $result.backup_id
-$backuptype = $result.mode
-$starttime = $result.start_time
-$status = $result.status
-$failuremessage = $result.message
+	$assetname = $result.asset_name
+	$assetid = $result.instance_id
+	$backupid = $result.backup_id
+	$backuptype = $result.mode
+	$starttime = $result.start_time
+	$status = $result.status
+	$failuremessage = $result.message
 
-
-$json =
-@"
-{
+$json = @"
+	{
 	"text": "*BACKUP FAILURE ON $ueb*",
 	"attachments": [
 		{
@@ -61,8 +66,9 @@ $json =
 			"color": "#CC0000"
 			}
 					]
-}
+	}
 "@
+
 
 ##...and now for the bad news! 
 
