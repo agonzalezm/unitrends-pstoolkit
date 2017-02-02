@@ -10,8 +10,8 @@ Connect-UebServer -Server $ueb -User root -Password P@ssw0rd1
 
 ##Get failed jobs
 
-$date = (Get-Date).AddDays(-7)
-$results = (Get-UebJob -Recent).backups | Where-Object { ($_.start_time -gt $date) -and ($_.Status -ne 'Success') -and ($_.instance_id -eq '16')}
+$date = (Get-Date).AddDays(-1)
+$results = (Get-UebJob -Recent).backups | Where-Object { ($_.start_time -gt $date) -and ($_.Status -ne 'Success')}
 
 
 foreach ($result in $results) {
