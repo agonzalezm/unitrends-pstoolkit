@@ -1,7 +1,10 @@
 function Get-UebInventory {
 	param(
 		[Parameter(Mandatory=$false)]
-		[string] $Name
+		[string] $Name,
+		[Parameter(Mandatory=$false)]
+		[string] $Id
+
 	)
 
 	CheckConnection
@@ -30,13 +33,21 @@ function Get-UebInventory {
 				$subnode |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
 				$vms += $subnode
 			}		
+		} elseif($node.type -eq "Linux") #Linux
+		{
+			$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+			$vms += $node
 		}
 	}
 	
 	if($Name) {
 		$vms= $vms | Where-Object { $_.name -like $Name }
 	}
+
+	if($Id) {
+		$vms= $vms | Where-Object { $_.id -like $Id }
+	}
 	
-	$prop = @('name','server')
+	$prop = @('id','name','server')
 	FormatUebResult $vms $prop
 }
