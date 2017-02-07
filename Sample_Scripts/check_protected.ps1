@@ -11,7 +11,7 @@ param(
 # User settings
 $ueb = "rc01"
 $user = "root"
-$pass = "vmware"
+$pass = "password"
 
 Import-Module Unitrends
 Connect-UebServer -Server $ueb -User $user -Password $pass | Out-Null
