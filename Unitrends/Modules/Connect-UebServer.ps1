@@ -22,9 +22,7 @@
 #>
 function Connect-UebServer {
 	[CmdletBinding(
-
-        DefaultParameterSetName=”PSCred”
-
+        DefaultParameterSetName="PSCred"
     )]
 	param (
 
