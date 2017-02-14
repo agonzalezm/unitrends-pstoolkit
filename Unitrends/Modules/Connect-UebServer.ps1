@@ -25,7 +25,6 @@ function Connect-UebServer {
         DefaultParameterSetName="PSCred"
     )]
 	param (
-
 		[Parameter(Mandatory=$true,Position=0)]
 		[string] $Server,
         [Parameter(Mandatory=$true,Position=1, ParameterSetName="UserPass")]
@@ -37,26 +36,19 @@ function Connect-UebServer {
 
 	)
     
-    Switch ($PsCmdlet.ParameterSetName){
-    
-        "UserPass" {
-            
+    Switch ($PsCmdlet.ParameterSetName){   
+        "UserPass" {            
             $body =  @{
 		        username=$User;
 		        password=$Password;
 	        }
-
         }
-        "PSCred" {
-            
+        "PSCred" {            
             $body =  @{
 		        username=$Credential.UserName;
 		        password=$Credential.GetNetworkCredential().Password;
 	        }
-
-        }
-
-    
+        }   
     } 
 
 	$response = Invoke-RestMethod -Uri "https://$Server/api/login" -Method Post -Body (ConvertTo-Json -InputObject $body)
