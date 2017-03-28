@@ -18,7 +18,7 @@
 .PARAMETER Flat
     Sets the job to restore without folder structure. Defaults to False. 
 .EXAMPLE
-    Start-UebRestoreJob -backupID 11017 -clientID 35 -includes "c:/users/Administrator/" -directory "c:/recover"
+    Start-UebRestoreFile -backupID 11017 -clientID 35 -includes "c:/users/Administrator/" -directory "c:/recover"
 #>
 function Start-UebRestoreFile{
 param(
@@ -30,7 +30,7 @@ param(
     [string]$directory,
     [string[]]$includes,
     [string[]]$excludes,
-    [switch]$flat = $false
+    [bool]$flat = $false
 )
 # Verb Options?   Start- Submit-
 
