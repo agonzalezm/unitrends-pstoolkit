@@ -39,3 +39,4 @@ Get-ChildItem $psscriptroot\Modules\*.ps1 | % {
 	    }
 "@
 	[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3, [Net.SecurityProtocolType]::Tls, [Net.SecurityProtocolType]::Tls12
