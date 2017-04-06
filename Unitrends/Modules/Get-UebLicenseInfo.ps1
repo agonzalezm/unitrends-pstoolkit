@@ -1,11 +1,7 @@
 function Get-UebLicenseInfo {
-	[CmdletBinding()]
-	param(
-
-	)
 
 	CheckConnection
-	
+
 	$response = UebGet("api/license")
 
 	$obj = $response
