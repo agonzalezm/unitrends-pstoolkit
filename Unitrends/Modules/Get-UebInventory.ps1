@@ -1,44 +1,53 @@
 function Get-UebInventory {
 	param(
 		[Parameter(Mandatory=$false)]
-		[string] $Name
+		[string] $Name,
+		[Parameter(Mandatory=$false)]
+		[string] $Id
+
 	)
 
 	CheckConnection
-	$response = UebGet("api/inventory")
+	$response = UebGet("api/assets")
 
-	$nodes = $response.inventory.nodes
+	$nodes = $response.data
 	
 	[array]$vms = $null
 	
 	foreach( $node in $nodes)
 	{
-		if($node.type_family -eq 202000) #VMware
+		if($node.type -eq "VMware") #VMware
 		{	
-			foreach( $vm in $node.nodes)
+			foreach( $vm in $node.children)
 			{
 				$vm |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
 				$vms += $vm
 			}
-		} elseif($node.type_family -eq 2000) #Windows
+		} elseif($node.type -eq "Windows") #Windows
 		{
-			foreach( $subnode in $node.nodes)
+			$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+			$vms += $node
+
+			foreach( $subnode in $node.children)
 			{
-				if($subnode.type_family -eq 201000)
-				{
-					foreach($vm in $subnode.nodes) {
-						$vm |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
-						$vms += $vm
-					}
-				}
+				$subnode |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+				$vms += $subnode
 			}		
+		} elseif($node.type -eq "Linux") #Linux
+		{
+			$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+			$vms += $node
 		}
 	}
 	
 	if($Name) {
 		$vms= $vms | Where-Object { $_.name -like $Name }
 	}
+
+	if($Id) {
+		$vms= $vms | Where-Object { $_.id -like $Id }
+	}
 	
-	$prop = @('name','server')
+	$prop = @('id','name','server')
 	FormatUebResult $vms $prop
 }
