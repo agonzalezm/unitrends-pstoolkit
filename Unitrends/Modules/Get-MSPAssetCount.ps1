@@ -8,7 +8,7 @@
 #>
 function Get-MSPAssetCount {
 	param(
-		[Parameter(Mandatory=$true,Position=2, ParameterSetName="UserPass")]
+	[Parameter(Mandatory=$true,Position=2, ParameterSetName="UserPass")]
         [SecureString] $Password,
         [switch] $ssh
     )
