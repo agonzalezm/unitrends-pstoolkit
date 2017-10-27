@@ -18,7 +18,7 @@ function Get-UebIr {
 
 	if($response.data.hv_ir.length -gt 0)
 	{
-		$obj = $obt + $response.data.hv_ir
+		$obj = $obj + $response.data.hv_ir
 	}
 
 	$prop = @('virtual_id','vm_name','status','mode')
