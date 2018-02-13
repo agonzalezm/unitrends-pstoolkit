@@ -8,32 +8,37 @@ function Start-UebIr {
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory=$false,ValueFromPipeline=$true)]
-		$Host,
+		$Server,
 		$Name,
 		$Datastore,
+		$Directory,
 		$BackupId,
-		[switch] $Live,
+		[switch] $Audit,
+		[switch] $PowerOn,
 		$Address
 	)
 	process {
 		
-		$audit = $true
-
-		if($Live) {
-			$audit = $false
-		}
-
+		Write-Host "Audit: $Audit"
+		Write-Host "PowerOn: $PowerOn"
 		$target = New-Object PSObject -Property @{ 
-				host = $Host
+				host = $Server
 				name = $Name
-				datastore = $Datastore
 		}
+
+		if($Directory) {				
+			$target |Add-Member directory $Directory				
+		} else {
+			$target |Add-Member datastore $datastore				
+		}
+
 
 		$Object = New-Object PSObject -Property @{ 
-			target = $target
-			backup_id = $BackupId
-			audit = $audit
 			address = $Address
+			audit = if ($Audit) { $true } else { $false }
+			poweron = if ($PowerOn) { $true } else { $false }
+			backup_id = $BackupId							
+			target = $target
 		}
 		
 		$response = UebPost "api/restore/instant/?sid=1" $Object
