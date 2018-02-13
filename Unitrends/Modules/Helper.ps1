@@ -15,7 +15,7 @@ function UebPost {
 	param ([string] $api, $body)
 	
 	if($body -ne $null){
-		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Post -Headers $global:UebAuthHeader -Body (ConvertTo-Json -InputObject $body -Depth 10) 
+		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Post -Headers $global:UebAuthHeader -Body (ConvertTo-Json -InputObject $body -Depth 10 -Compress) 
 	} else {
 		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Post -Headers $global:UebAuthHeader
 	}
