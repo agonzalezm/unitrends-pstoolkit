@@ -11,14 +11,14 @@ function Get-UebIr {
 	$response = UebGet("api/virtual_clients")
 
 	$obj
-	if($response.data.vm_ir.data.length -gt 0) 
+	if($response.data.vm_ir.length -gt 0) 
 	{
-		$obj = $response.data.vm_ir.data 
+		$obj = $response.data.vm_ir
 	}
 
-	if($response.data.hv_ir.data.length -gt 0)
+	if($response.data.hv_ir.length -gt 0)
 	{
-		$obj = $obt + $response.data.hv_ir.data
+		$obj = $obj + $response.data.hv_ir
 	}
 
 	$prop = @('virtual_id','vm_name','status','mode')
