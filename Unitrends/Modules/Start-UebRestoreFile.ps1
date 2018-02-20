@@ -30,7 +30,8 @@ param(
     [string]$directory,
     [string[]]$includes,
     [string[]]$excludes,
-    [bool]$flat = $false
+    [bool]$flat = $false,
+    [bool]$synthesis = $false
 )
 # Verb Options?   Start- Submit-
 
@@ -42,10 +43,10 @@ param(
 # Build Target
 $target = @{
     flat = $flat #Required
-    non_destructive = $true #Required
+    non_destructive = $false #Required
     newer = $true #Required
     today = $false #Required
-    unix = $true #Required
+    unix = $false #Required
     directory = $directory #Optional, but including with blank works as not existing
 }
 
@@ -60,19 +61,12 @@ $body = @{
     target = $target #Optional
     before_cmd = "" #Required, but may be empty
     after_cmd = "" #Required, but may be empty
-    synthesis = $true #Required if synthesized files ?
+    synthesis = $synthesis #Required if synthesized files ?
     includes = $theseIncludes
     excludes = $theseExcludes
 }
 #endregion RestoreObject
 
-
 UebPost "/api/restore/full/?sid=$sid" $body
-
-
-
-
-
-
 
 }
