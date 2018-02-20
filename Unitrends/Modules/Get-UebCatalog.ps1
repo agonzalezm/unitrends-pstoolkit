@@ -2,12 +2,20 @@ function Get-UebCatalog {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory=$false)]
-		[string] $Name
+		[string] $Name,
+		[Parameter(Mandatory=$false)]
+		[string] $InstanceId
+
 	)
 
 	CheckConnection
-	
-	$response = UebGet("api/catalog")
+	$StartDate = (Get-Date).AddDays(-30).ToString("MM/dd/yyyy")
+	if($InstanceId)
+	{
+		$api_iid = "&iid=" + $InstanceId
+	}
+
+	$response = UebGet("api/catalog/?start_date=" + $StartDate + $api_iid)
 	
 
 	$instances = $response.catalog.instances
@@ -15,6 +23,7 @@ function Get-UebCatalog {
 	if($Name) {
 		$instances = $instances | Where-Object { $_.database_name -like $Name -or $_.client_name -like $Name }
 	}	
+
 
 	foreach($o in $instances){
 		$asset = ""
