@@ -15,7 +15,7 @@ function Get-UebJob {
 	{
 		$response = UebGet("api/jobs/active")
 
-		$obj = $response.data | Where-Object { $_.status -notmatch "Successful"}
+		$obj = $response.data 
 		$prop = @('name','status','percent_complete','instance_name')
 	} elseif($Recent){
 		$response = UebGet("api/jobs/history")
