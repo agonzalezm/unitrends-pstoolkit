@@ -7,13 +7,13 @@ function CheckConnection {
 
 function UebGet {
 	param ([string] $api)
-
+	$ProgressPreference = 'SilentlyContinue'
 	Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method  Get -Headers $global:UebAuthHeader
 }
 
 function UebPost {
 	param ([string] $api, $body)
-	
+	$ProgressPreference = 'SilentlyContinue'
 	if($body -ne $null){
 		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Post -Headers $global:UebAuthHeader -Body (ConvertTo-Json -InputObject $body -Depth 10 -Compress) 
 	} else {
@@ -23,6 +23,7 @@ function UebPost {
 
 function UebPut {
 	param ([string] $api, $body)
+	$ProgressPreference = 'SilentlyContinue'
 	if($body -ne $null){
 		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Put -Headers $global:UebAuthHeader -Body (ConvertTo-Json -InputObject $body -Depth 10) 
 	} else {
@@ -32,6 +33,7 @@ function UebPut {
 
 function UebDelete {
 	param ([string] $api, $body)
+	$ProgressPreference = 'SilentlyContinue'
 	if($body -ne $null){
 		Invoke-RestMethod -Uri "https://$global:UebServer/$api" -Method Delete -Headers $global:UebAuthHeader -Body (ConvertTo-Json -InputObject $body -Depth 10) 
 	} else {
