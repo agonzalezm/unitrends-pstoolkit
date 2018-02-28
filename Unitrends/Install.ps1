@@ -1,4 +1,5 @@
 ##Download
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
 Write-Host "Downloading latest version of Unitrends PSToolkit ..." -ForegroundColor Cyan
 $webclient = New-Object System.Net.WebClient
