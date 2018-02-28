@@ -2,7 +2,7 @@
 
 Write-Host "Downloading latest version of Unitrends PSToolkit ..." -ForegroundColor Cyan
 $webclient = New-Object System.Net.WebClient
-$url = "https://github.com/Unitrends/unitrends-pstoolkit/archive/master.zip"
+$url = "http://github.com/Unitrends/unitrends-pstoolkit/archive/master.zip"
 $file = "$($env:TEMP)\Unitrends-pstoolkit.zip"
 $webclient.DownloadFile($url,$file)
 
