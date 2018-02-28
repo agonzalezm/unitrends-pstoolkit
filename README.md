@@ -29,9 +29,10 @@ Download and getting started
 
 **Download and install:**
 
-1. Open Powershell as Administrator and allow execution of unsigned scripts by running command: Set-ExecutionPolicy Bypass
-2. Run commmand to download latest version and install:  
-``` iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 | iex ```
+Open Administrator Powershell Console:
+
+    PS> Set-ExecutionPolicy Bypass
+    PS> iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 | iex
 
 **Usage:**
 
