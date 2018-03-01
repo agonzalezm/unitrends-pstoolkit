@@ -29,39 +29,28 @@ Download and getting started
 
 **Download and install:**
 
-1. Open Powershell as Administrator and allow execution of unsigned scripts by running command: Set-ExecutionPolicy Bypass
-2. Run commmand to download latest version and install:  
-``` iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 | iex ```
+Open Administrator Powershell Console:
+
+    PS> Set-ExecutionPolicy Bypass
+    PS> iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 | iex
 
 **Usage:**
 
     PS> Import-Module Unitrends
-      [*] Welcome to Unitrends Powershell Toolkit! ---------------------------------------------------------
-      
-    Sample usage:   
-
-            Connect-UebServer -Server ueb01 -User root -Password yourpass
-            Get-UebJob
-            Get-UebJob -Active
-            Get-UebJob -Recent
-            Get-UebJob -Active|Stop-UebJob
-            Get-UebJob -Active|Stop-UebJob
-            Get-UebJob -Name job1*|Start-UebJob
-            Get-UebAlert
-            Get-UebVirtualClient
-
-
-    Copyright (C) Unitrends,Inc. All rights reserved.
+    PS> Connect-UebServer -Server ueb01 -User root -Password yourpass
 
 **Update:**
 
-Once installed you can update to last version using Cmdlet Update-UebPsToolkit
+Once installed you can update to last version opening Administrator Powershell Console and run:
+
+    PS> Import-Module Unitrends
+    PS> Update-UebPsToolkit
 
 **Help:**
 
 You can list all available cmdlets using:
 
-PS C:\> Get-Uebhelp
+    PS> Get-Uebhelp
 
 **Blogs articles about Unitrends PsToolkit:**
 
