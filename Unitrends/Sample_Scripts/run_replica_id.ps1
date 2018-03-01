@@ -97,15 +97,27 @@ Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $
 
 # restore complete,change vm id, remove saved state, change disk path and register vm or other import incompatibilities
 Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed
-$new_xml = [guid]::NewGuid().ToString().ToUpper() + ".xml"
 
-$xml = Get-Item -Path "$directory\*.xml"
+$new_guid = [guid]::NewGuid().ToString().ToUpper()
 
-Rename-Item -Path $xml -NewName $new_xml
+$vmcx = Get-Item -Path "$directory\*.preCheckpointCopy"
+$vm_config = ""
+if($vmcx)  {
+    $vm_config = $new_guid + ".vmcx"
+    $new_vmrs = $new_guid + ".vmrs"
+    Remove-Item -Path "$directory\*.vmcx"
+    Rename-Item  $vmcx -NewName $vm_config
+    $vmrs = Get-Item -Path "$directory\*.vmrs"
+    Rename-Item  $vmrs -NewName $new_vmrs
+} else  {
+    $vm_config = $new_guid + ".xml"
+    $xml = Get-Item -Path "$directory\*.xml"
+    Rename-Item -Path $xml -NewName $vm_config
+}
 
-$xml = Get-Item -Path "$directory\*.xml"
+$vm_config = $directory + "\" + $vm_config
 
-$report = Compare-VM  -Path $xml -Register
+$report = Compare-VM  -Path $vm_config -Register
 $report.VM|Remove-VMSavedState -ErrorAction Ignore
 $report.VM|rename-vm -NewName $vm_name
 $report.VM|Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName $switch_name
@@ -131,7 +143,8 @@ Remove-Item -Path "$directory\*.xml"
 Remove-Item -Path "$directory\*.bin"
 Remove-Item -Path "$directory\*.vsv"
 Remove-Item -Path "$directory\*.##meta##"
-
+Remove-Item -Path "$directory\*.vmcx"
+Remove-Item -Path "$directory\*.vmrs"
 
 
 # remove previous restores
