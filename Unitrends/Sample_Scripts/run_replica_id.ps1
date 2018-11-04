@@ -1,14 +1,14 @@
 param(
-    $instance = 220
+    $instance = 238
 )
 
 #--- user settings ------
 #ueb from where to restore backups
-$ueb = "rc02"
+$ueb = "ueb02"
 $user = "root"
 $pass = "password"
 #hyperv client to restore to replicas
-$client_id=43
+$client_id=6
 $replica_name_prefix="customer1"
 $restore_path="C:/vmtest/replica/"
 $switch_name="test-vswitch"
@@ -48,7 +48,12 @@ trap [Exception] {
       Write-Log -Severity Error -Message $("TRAPPED: " + $_.Exception.Message);
 	  Write-Log -Severity Error -Message "ERROR:"
 	  Write-Log -Severity Error -Message $_.InvocationInfo.PositionMessage
-	  Write-Log -Severity Error -Message "ExitCode: 9"
+      Write-Log -Severity Error -Message "ExitCode: 9"
+      Write-Error -Message $("TRAPPED: " + $_.Exception.GetType().FullName);
+      Write-Error -Message $("TRAPPED: " + $_.Exception.Message);
+      Write-Error -Message "ERROR:"
+      Write-Error -Message $_.InvocationInfo.PositionMessage
+      Write-Error -Message "ExitCode: 9"
       exit 9
 }	
 
@@ -61,6 +66,7 @@ $backup_date = [datetime]::Parse($catalog.last_backup_date).ToString("yyyyMMdd_H
 $backup_id = $catalog.last_backup_id
 $vm_name = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_" + $backup_date
 $directory = $restore_path + $vm_name
+$directory_temp = $restore_path + $vm_name + "_temp"
 
 $vm = Get-VM|where-object {$_.name -eq $vm_name}
 if($vm)
@@ -75,9 +81,18 @@ if (Test-Path $directory -PathType Container) {
     Remove-Item -Path $directory -Recurse -Force
 }
 
-Write-Progress -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory"  -PercentComplete 0 -completed
+$directory=$directory -replace "/","\"
+New-Item -ItemType Directory -Path $directory -Force
 
-$restore = Start-UebRestoreFile -backupID $catalog.last_backup_id -clientID $client_id -directory $directory -flat $true -synthesis $false
+if (Test-Path $directory_temp -PathType Container) {
+    Remove-Item -Path $directory_temp -Recurse -Force
+} else {
+    New-Item -ItemType Directory -Force -Path $directory_temp
+}
+
+Write-Progress -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory_temp"  -PercentComplete 0 -completed
+
+$restore = Start-UebRestoreFile -backupID $catalog.last_backup_id -clientID $client_id -directory $directory_temp -flat $false -synthesis $false
 $restore_id = $restore.id
 
 $restore_job = $null
@@ -88,15 +103,22 @@ while($restore_job -eq $null) {
 
 while($restore_job.status -eq "Queued" -or $restore_job.status -eq "Active" -or $restore_job.status -eq "Connecting")
 {
-    Write-Progress -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory"  -PercentComplete $restore_job.percent_complete
+    Write-Progress -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory_temp"  -PercentComplete $restore_job.percent_complete
     $restore_job = get-uebjob -Active|Where-Object {$_.id -eq $restore_id}
     Sleep 3
 }
 
-Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory"  -PercentComplete 100 -completed
+Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory_temp"  -PercentComplete 100 -completed
 
 # restore complete,change vm id, remove saved state, change disk path and register vm or other import incompatibilities
 Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed
+
+#move vhd and config files from temp restore dir to final dir
+$files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.xml,*.preCheckpointCopy,*.vmrs
+foreach($file in $files)
+{
+    Move-Item -Path $file.FullName -Destination $directory
+}
 
 
 $new_guid = [guid]::NewGuid().ToString().ToUpper()
