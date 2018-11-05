@@ -82,12 +82,11 @@ if (Test-Path $directory -PathType Container) {
 }
 
 $directory=$directory -replace "/","\"
+$directory=$directory -replace " ","_"
 New-Item -ItemType Directory -Path $directory -Force
 
 if (Test-Path $directory_temp -PathType Container) {
     Remove-Item -Path $directory_temp -Recurse -Force
-} else {
-    New-Item -ItemType Directory -Force -Path $directory_temp
 }
 
 Write-Progress -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory_temp"  -PercentComplete 0 -completed
@@ -114,7 +113,7 @@ Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $
 Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed
 
 #move vhd and config files from temp restore dir to final dir
-$files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.xml,*.preCheckpointCopy,*.vmrs
+$files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.xml,*.preCheckpointCopy,*.vmrs,*.vhdx
 foreach($file in $files)
 {
     Move-Item -Path $file.FullName -Destination $directory
@@ -158,7 +157,7 @@ foreach($vhd in $vhds)
     
     $new_path = $directory + $vhd_name
     Write-Host $new_path
-    Set-VMHardDiskDrive -VMHardDiskDrive $vhd -Path $new_path #–ControllerType $vhd.ControllerType –ControllerNumber $vhd.ControllerNumber -ControllerLocation $vhd.ControllerLocation
+    Set-VMHardDiskDrive -VMHardDiskDrive $vhd -Path $new_path #�ControllerType $vhd.ControllerType �ControllerNumber $vhd.ControllerNumber -ControllerLocation $vhd.ControllerLocation
 }
 
 Import-VM $report
