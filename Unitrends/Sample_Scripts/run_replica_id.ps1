@@ -44,16 +44,12 @@ function Write-Log {
 }
 
 trap [Exception] {
-      Write-Log -Severity Error -Message $("TRAPPED: " + $_.Exception.GetType().FullName);
       Write-Log -Severity Error -Message $("TRAPPED: " + $_.Exception.Message);
 	  Write-Log -Severity Error -Message "ERROR:"
 	  Write-Log -Severity Error -Message $_.InvocationInfo.PositionMessage
       Write-Log -Severity Error -Message "ExitCode: 9"
-      Write-Error -Message $("TRAPPED: " + $_.Exception.GetType().FullName);
-      Write-Error -Message $("TRAPPED: " + $_.Exception.Message);
-      Write-Error -Message "ERROR:"
-      Write-Error -Message $_.InvocationInfo.PositionMessage
-      Write-Error -Message "ExitCode: 9"
+      Write-Error -Message "TRAPPED: $_.Exception.Message" -ErrorAction Continue
+      Write-Error -Message $_.InvocationInfo.PositionMessage -ErrorAction Continue
       exit 9
 }	
 
@@ -111,6 +107,14 @@ Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $
 
 # restore complete,change vm id, remove saved state, change disk path and register vm or other import incompatibilities
 Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed
+
+#check for open snapshots
+$files = Get-ChildItem -Path $directory_temp -Recurse -include *.avhdx,*.avhd
+if($files)
+{
+    Write-Error "Restored backup contains open snapshots files and is not suported"
+    Exit 1
+}
 
 #move vhd and config files from temp restore dir to final dir
 $files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.xml,*.preCheckpointCopy,*.vmrs,*.vhdx
