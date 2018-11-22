@@ -14,9 +14,6 @@ $restore_path="C:/vmtest/replica/"
 $switch_name="test-vswitch"
 #--- end of user settings ------
 
-
-
-
 # main code, dont modify
 
 $ErrorActionPreference = 'Stop'
@@ -62,7 +59,7 @@ $backup_date = [datetime]::Parse($catalog.last_backup_date).ToString("yyyyMMdd_H
 $backup_id = $catalog.last_backup_id
 $vm_name = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_" + $backup_date
 $directory = $restore_path + $vm_name
-$directory_temp = $restore_path + $vm_name + "_temp"
+$directory_temp = $restore_path + "temp_" + $vm_name
 
 $vm = Get-VM|where-object {$_.name -eq $vm_name}
 if($vm)
@@ -109,15 +106,30 @@ Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $
 Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed
 
 #check for open snapshots
-$files = Get-ChildItem -Path $directory_temp -Recurse -include *.avhdx,*.avhd
-if($files)
+$xml_file = Get-ChildItem -Path $directory_temp -Recurse -include *.xml | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
+if($files.Count -eq 1)
 {
-    Write-Error "Restored backup contains open snapshots files and is not suported"
+    $content = Get-Content $xml_file
+    if($content|Select-String "\.avhd|\.avhdx")
+    {
+        Write-Error "Restored backup contains open snapshots files and is not suported"
+        Exit 1   
+    }
+} else 
+{
+    Write-Error "Restored backup contains more than one .xml file in Virtual Machines folder"
     Exit 1
 }
 
-#move vhd and config files from temp restore dir to final dir
-$files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.xml,*.preCheckpointCopy,*.vmrs,*.vhdx
+#move config files from Virtual Machines
+$files = Get-ChildItem -Path $directory_temp -Recurse -include *.xml,*.preCheckpointCopy,*.vmrs | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
+foreach($file in $files)
+{
+    Move-Item -Path $file.FullName -Destination $directory
+}
+
+#move vhd, vhdx rom temp restore dir to final dir
+$files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.vhdx
 foreach($file in $files)
 {
     Move-Item -Path $file.FullName -Destination $directory
@@ -166,14 +178,7 @@ foreach($vhd in $vhds)
 
 Import-VM $report
 
-Remove-Item -Path "$directory\*.xml"
-Remove-Item -Path "$directory\*.bin"
-Remove-Item -Path "$directory\*.vsv"
-Remove-Item -Path "$directory\*.##meta##"
-Remove-Item -Path "$directory\*.vmcx"
-Remove-Item -Path "$directory\*.vmrs"
-
-
+Remove-Item -Path $directory_temp -Force -Confirm:$false
 
 # remove previous restores
 $vm_prefix = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_*"
