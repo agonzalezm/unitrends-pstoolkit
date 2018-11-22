@@ -178,7 +178,7 @@ foreach($vhd in $vhds)
 
 Import-VM $report
 
-Remove-Item -Path $directory_temp -Force -Confirm:$false
+Remove-Item -Path $directory_temp -Recurse -Force
 
 # remove previous restores
 $vm_prefix = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_*"
