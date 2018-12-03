@@ -54,7 +54,6 @@ trap [Exception] {
       exit 9
 }	
 
-<<<<<<< HEAD
 # functions
 
 
@@ -87,25 +86,6 @@ function Get-ParentPath {
     }
     
 	$Result
-=======
-
-Import-Module Unitrends
-Connect-UebServer -Server $ueb -User $user -Password $pass
-
-$catalog = Get-UebCatalog -InstanceId $instance
-$backup_date = [datetime]::Parse($catalog.last_backup_date).ToString("yyyyMMdd_HHmmss")
-$backup_id = $catalog.last_backup_id
-$vm_name = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_" + $backup_date
-$directory = $restore_path + $vm_name
-$directory_temp = $restore_path + "temp_" + $vm_name
-
-$vm = Get-VM|where-object {$_.name -eq $vm_name}
-if($vm)
-{
-    Write-Progress -Id $instance -Activity $instance -Status "VM ($vm_name) already exists with backup_id $backup_id"  -PercentComplete 100 -completed
-    sleep 5
-    exit 0
->>>>>>> a4b3b82e673c3f8270bf8e6c803ef177776c52a4
 }
 
 function Merge-VMDisks {    
@@ -271,40 +251,9 @@ function Import
     Merge-VMDisks -VM $report.VM
     $report.VM|Get-VMSnapshot|Remove-VMSnapshot
 
-<<<<<<< HEAD
     Import-VM $report
 
     Remove-Item -Path $directory_temp -Recurse -Force
-=======
-#check for open snapshots
-$xml_file = Get-ChildItem -Path $directory_temp -Recurse -include *.xml | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
-if($files.Count -eq 1)
-{
-    $content = Get-Content $xml_file
-    if($content|Select-String "\.avhd|\.avhdx")
-    {
-        Write-Error "Restored backup contains open snapshots files and is not suported"
-        Exit 1   
-    }
-} else 
-{
-    Write-Error "Restored backup contains more than one .xml file in Virtual Machines folder"
-    Exit 1
-}
-
-#move config files from Virtual Machines
-$files = Get-ChildItem -Path $directory_temp -Recurse -include *.xml,*.preCheckpointCopy,*.vmrs | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
-foreach($file in $files)
-{
-    Move-Item -Path $file.FullName -Destination $directory
-}
-
-#move vhd, vhdx rom temp restore dir to final dir
-$files = Get-ChildItem -Path $directory_temp -Recurse -include *.vhd,*.vhdx
-foreach($file in $files)
-{
-    Move-Item -Path $file.FullName -Destination $directory
->>>>>>> a4b3b82e673c3f8270bf8e6c803ef177776c52a4
 }
 
 function CleanUp {
@@ -342,15 +291,9 @@ if($ImportOnly -eq $false) {
     $directory = $ImportPath
 }
 
-<<<<<<< HEAD
 if($RestoreOnly -eq $true) { 
     return
 }
-=======
-Import-VM $report
-
-Remove-Item -Path $directory_temp -Recurse -Force
->>>>>>> a4b3b82e673c3f8270bf8e6c803ef177776c52a4
 
 #Import
 Import $directory 
