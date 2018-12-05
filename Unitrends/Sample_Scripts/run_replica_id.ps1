@@ -36,11 +36,21 @@ function Write-Log {
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [ValidateSet('Information','Warning','Error')]
-        [string]$Severity = 'Information'
+        [string]$Severity = 'Information',
+        
+        [Parameter()]
+        [switch]$Init
     )
 
     $date = (Get-Date -f g)
     $log = $restore_path + "logs/" + $instance
+    if($Init) {
+        if (Test-Path $log)
+        {
+            Remove-Item $log -Force 
+        }
+    }
+
     "$date - [$severity] - $Message" | Out-File -Append -FilePath $log    
 }
 
@@ -60,7 +70,7 @@ trap [Exception] {
 function Get-ParentPath {
     Param([String]$VHDPath)
 
-    Write-Log -Severity Information -Message "Getting disk information for file $VHDPath"
+    Write-Log -Message "Getting disk information for file $VHDPath"
 
 	$VHDSVC = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ImageManagementService -ErrorAction Stop
     $VHDInfo = [xml]$VHDSVC.GetVirtualHardDiskSettingData($VHDPath).SettingData
@@ -75,14 +85,14 @@ function Get-ParentPath {
                 $Result += $ParentPath
             }
             
-			Write-log -Severity Information -Message "Got disk chain information:"
-            $Result | % { Write-Log -Severity Information -Message "  $_" }
+			Write-log -Message "Got disk chain information:"
+            $Result | % { Write-Log -Message "  $_" }
         } else {
 			$Result = $VHDPath  
-            Write-Log -Severity Information -Message "Disk '$Result' is not a differencing disk - does not have any parent.." 
+            Write-Log -Message "Disk '$Result' is not a differencing disk - does not have any parent.." 
         }
     } else {
-		Write-Log -Severity Information -Message "Disk file '$VHDPath' does not exist" 
+		Write-Log -Message "Disk file '$VHDPath' does not exist" 
     }
     
 	$Result
@@ -97,20 +107,21 @@ function Merge-VMDisks {
     foreach ($Disk in ($VMDisks | Where { $_.Path -match ":" })) {
         $DiskTree = Get-ParentPath -VHDPath $Disk.Path
         if ($DiskTree.Count -gt 1) { 
-            Write-Log -Severity Information -Message "Processing Disk '$($Disk.Path)'"
+            Write-Log -Message "Processing Disk '$($Disk.Path)'"
             for ($i=0; $i -lt $DiskTree.Count-1; $i++) {
-                Write-Log -Severity Information -Message "  Merging file '$($DiskTree[$i])' # $($i+1) of $($DiskTree.Count-1) .." 
+                Write-Log -Message "  Merging file '$($DiskTree[$i])' # $($i+1) of $($DiskTree.Count-1) .." 
                 Merge-VHD -Path $DiskTree[$i] -Confirm:$false -Force
             }
                 
             $new_path = $DiskTree[$DiskTree.Count-1]
-            Write-Log -Severity Information -Message "Setting disk path to $new_path .." 
+            Write-Log -Message "Setting disk path to $new_path .." 
             Set-VMHardDiskDrive -VMHardDiskDrive $Disk -Path $new_path
         }
     }           
  } 
 
 function Restore {
+    Write-Log -Message "Starting Restore"
     Import-Module Unitrends
     Connect-UebServer -Server $ueb -User $user -Password $pass | Out-Null
     
@@ -164,7 +175,9 @@ function Restore {
 function Import
 {
     param([string]$directory)
-    
+
+    Write-Log -Message "Starting Import"
+
     $directory=$directory -replace "/","\"
     $directory_temp = $directory + "\unitrends_restore"     
 
@@ -229,6 +242,7 @@ function Import
     sleep 5
 
     $report = Compare-VM  -Path $vm_config -Register
+    Write-Log -Message "Compare-VM Incompatibilities: $($report.Incompatibilities|Out-String)"
     $report.VM|Remove-VMSavedState -ErrorAction Ignore
     $report.VM|rename-vm -NewName $vm_name
     $report.VM|Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName $switch_name
@@ -284,11 +298,14 @@ function CleanUp {
 #$vm_name = "ueb02_378_nano01_20181122_231813"
 #$directory = $restore_path + $vm_name
 
+Write-Log -Message "Main(): Start" -Init
+
 # Restore
 if($ImportOnly -eq $false) {
     $directory = Restore
 } else {
     $directory = $ImportPath
+    $vm_name = $directory|split-path -leaf
 }
 
 if($RestoreOnly -eq $true) { 
