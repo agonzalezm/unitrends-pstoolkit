@@ -177,7 +177,7 @@ function Import
     param([string]$directory)
 
     Write-Log -Message "Starting Import"
-
+    $vm_name = $directory|split-path -leaf
     $directory=$directory -replace "/","\"
     $directory_temp = $directory + "\unitrends_restore"     
 
@@ -305,7 +305,6 @@ if($ImportOnly -eq $false) {
     $directory = Restore
 } else {
     $directory = $ImportPath
-    $vm_name = $directory|split-path -leaf
 }
 
 if($RestoreOnly -eq $true) { 
