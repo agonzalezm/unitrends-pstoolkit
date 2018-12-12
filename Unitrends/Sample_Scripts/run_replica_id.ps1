@@ -105,9 +105,29 @@ function Merge-VMDisks {
     $VMDisks = $VM | Get-VMHardDiskDrive
 
     foreach ($Disk in ($VMDisks | Where { $_.Path -match ":" })) {
-        $DiskTree = Get-ParentPath -VHDPath $Disk.Path
+        $vdisk_path = $Disk.Path
+
+        if(!(Test-Path $vdisk_path)) {
+            # the disk in the config file doesnt exists lets see if there is an autorevery disk and use it.
+            Write-Log -Message "The Disk '$($vdisk_path)' doesnt exist. Checking for -AutoRecovery disk..."
+	    
+	    if($vdisk_path.Contains(".avhdx")) { 
+                $autorecovery_disk = $vdisk_path.Substring(0,$vdisk_path.Length - 43) + "-AutoRecovery.avhdx"
+            } else { 
+                $autorecovery_disk = $vdisk_path.Substring(0,$vdisk_path.Length - 42) + "-AutoRecovery.avhd"
+            }
+            
+            if(Test-Path $autorecovery_disk){
+                $vdisk_path = $autorecovery_disk
+		Write-Log -Message "AutoRecovery disk found, it will be used for merge ..."
+            } else {
+                throw "The disk used in config file $vdisk_path or $autorecovery_disk doesnt exists. Cant continue."
+            }
+        }
+
+        $DiskTree = Get-ParentPath -VHDPath $vdisk_path
         if ($DiskTree.Count -gt 1) { 
-            Write-Log -Message "Processing Disk '$($Disk.Path)'"
+            Write-Log -Message "Processing Disk '$($vdisk_path)'"
             for ($i=0; $i -lt $DiskTree.Count-1; $i++) {
                 Write-Log -Message "  Merging file '$($DiskTree[$i])' # $($i+1) of $($DiskTree.Count-1) .." 
                 Merge-VHD -Path $DiskTree[$i] -Confirm:$false -Force
@@ -116,7 +136,7 @@ function Merge-VMDisks {
             $new_path = $DiskTree[$DiskTree.Count-1]
             Write-Log -Message "Setting disk path to $new_path .." 
             Set-VMHardDiskDrive -VMHardDiskDrive $Disk -Path $new_path
-        }
+        }    
     }           
  } 
 
