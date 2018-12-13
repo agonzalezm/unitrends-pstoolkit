@@ -70,7 +70,7 @@ trap [Exception] {
 function Get-ParentPath {
     Param([String]$VHDPath)
 
-    Write-Log -Message "Getting disk information for file $VHDPath"
+    Write-Log -Message "Getting disk chain for file $VHDPath"
 
 	$VHDSVC = Get-WmiObject -Namespace root\virtualization\v2 -Class Msvm_ImageManagementService -ErrorAction Stop
     $VHDInfo = [xml]$VHDSVC.GetVirtualHardDiskSettingData($VHDPath).SettingData
@@ -85,7 +85,6 @@ function Get-ParentPath {
                 $Result += $ParentPath
             }
             
-			Write-log -Message "Got disk chain information:"
             $Result | % { Write-Log -Message "  $_" }
         } else {
 			$Result = $VHDPath  
@@ -102,6 +101,7 @@ function Merge-VMDisks {
 
     Param( [Microsoft.HyperV.PowerShell.VirtualMachine] $VM)
     
+    Write-Log -Message "Merge-VMDisks(): Starting disk merge"
     $VMDisks = $VM | Get-VMHardDiskDrive
 
     foreach ($Disk in ($VMDisks | Where { $_.Path -match ":" })) {
@@ -141,7 +141,7 @@ function Merge-VMDisks {
  } 
 
 function Restore {
-    Write-Log -Message "Starting Restore"
+    Write-Log -Message "Restore(): Starting Restore"
     Import-Module Unitrends
     Connect-UebServer -Server $ueb -User $user -Password $pass | Out-Null
     
@@ -153,12 +153,13 @@ function Restore {
     $directory = $directory -replace " ","_"
     $directory_temp = $directory + "\unitrends_restore"
     
+    
     $vm = Get-VM|where-object {$_.name -eq $vm_name}
     if($vm)
     {
         Write-Progress -Id $instance -Activity $instance -Status "Last backup is already restored. VM ($vm_name) already exists with backup_id $backup_id"  -PercentComplete 100 -completed
         Write-Warning "Last backup is already restored. VM ($vm_name) already exists with backup_id $backup_id"
-        sleep 5
+        Write-Log -Severity Warning "Last backup is already restored. VM ($vm_name) already exists with backup_id $backup_id"
         exit 0
     }
       
@@ -168,6 +169,7 @@ function Restore {
     
     Write-Progress -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory_temp"  -PercentComplete 0 -completed
     
+    Write-Log -Message "Restoring backup_id $backup_id to $directory_temp"
     $restore = Start-UebRestoreFile -backupID $catalog.last_backup_id -clientID $client_id -directory $directory_temp -flat $false -synthesis $false
     $restore_id = $restore.id
     
@@ -185,10 +187,7 @@ function Restore {
     }
     
     Write-Progress  -Id $instance -Activity $instance -Status "Restoring backup_id $backup_id to $directory_temp"  -PercentComplete 100 -completed
-    
-    # restore complete,change vm id, remove saved state, change disk path and register vm or other import incompatibilities
-    Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed    
-
+        
     return ,$directory
 }
 
@@ -196,35 +195,27 @@ function Import
 {
     param([string]$directory)
 
-    Write-Log -Message "Starting Import"
+    Write-Log -Message "Import(): Starting Import"
     $vm_name = $directory|split-path -leaf
     $directory=$directory -replace "/","\"
     $directory_temp = $directory + "\unitrends_restore"     
 
+    Write-Progress  -Id $instance -Activity $instance -Status "Import VM as $vm_name"  -PercentComplete 100 -completed    
     #check for open snapshots
     $xml_file = Get-ChildItem -Path $directory_temp -Recurse -include *.xml | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
-    if($xml_file.Count -eq 1)
-    {
-        $content = Get-Content $xml_file
-        if($content|Select-String "\.avhd|\.avhdx")
-        {
-            #Write-Warning "Restored backup contains open snapshots files and is not suported"
-            #Exit 1   
-        }
-    } else 
+    if($xml_file.Count -gt 1)
     {
         Write-Warning "Restored backup contains more than one .xml file in Virtual Machines folder"
+        Write-Log -Severity Error -Message "Restored backup contains more than one .xml file in Virtual Machines folder"
         Exit 1
     }
-
-    #$vm_dir = Get-ChildItem -Path $directory_temp -Recurse| Where-Object {$_.PsIsContainer -eq $True}| Where-Object {$_.FullName.EndsWith("Virtual Machines")}
-    #Move-Item -Path $vm_dir.FullName -Destination $directory
-    
-    #move config files from Virtual Machines
+   
+    #copy config files from Virtual Machines
     if (Test-Path "$directory/config" -PathType Container) {
         Remove-Item -Path "$directory/config" -Recurse -Force
     }
-    New-Item -ItemType Directory -Force -Path "$directory/config"
+
+    New-Item -ItemType Directory -Force -Path "$directory/config" | Out-Null
     $files = Get-ChildItem -Path $directory_temp -Recurse -include *.xml,*.preCheckpointCopy,*.vmrs | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
     foreach($file in $files)
     {
@@ -261,15 +252,20 @@ function Import
 
     sleep 5
 
+    Write-Log -Message "Running Compare-VM..."
     $report = Compare-VM  -Path $vm_config -Register
-    Write-Log -Message "Compare-VM Incompatibilities: $($report.Incompatibilities|Out-String)"
+    Write-Log -Message "Compare-VM Incompatibilities that we need to fix: $($report.Incompatibilities|Out-String)"
+    Write-Log -Message "Fixing VMSavedState"
     $report.VM|Remove-VMSavedState -ErrorAction Ignore
+    Write-Log -Message "Renaming VM to $vm_name"
     $report.VM|rename-vm -NewName $vm_name
+    Write-Log -Message "Configuring all networks to $switch_name"
     $report.VM|Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName $switch_name
 
     # wait 3 secs to saved state to be removed
     Sleep 5
 
+    Write-Log -Message "Fixing all VM disks path to use base dir: $directory"
     # set harddisk location to restored folder
     $vhds = $report.VM | Get-VMHardDiskDrive
     foreach($vhd in $vhds)
@@ -278,65 +274,91 @@ function Import
         $vhd_name = $path.Substring($path.LastIndexOf("\"))
         
         $new_path = $directory + $vhd_name
-        Write-Host $new_path
+        Write-Log -Message "  New disk path: $new_path"
         Set-VMHardDiskDrive -VMHardDiskDrive $vhd -Path $new_path #�ControllerType $vhd.ControllerType �ControllerNumber $vhd.ControllerNumber -ControllerLocation $vhd.ControllerLocation
     }
-
+    
     Merge-VMDisks -VM $report.VM
+    Write-Log -Message "Removing VM Snapshots"
     $report.VM|Get-VMSnapshot|Remove-VMSnapshot
 
-    Import-VM $report
+    Write-Log -Message "Running Import-VM..."
+    $out = Import-VM $report | Out-String
+    Write-Log -Message "Import-VM result: $out"
+    $out
 
     Remove-Item -Path $directory_temp -Recurse -Force
 }
 
-function CleanUp {
-    # remove previous restores
-    $vm_prefix = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_*"
-    $vms = get-vm -name $vm_prefix|Sort-Object -Descending|Select-Object -Skip 1
+function CleanUp 
+{
+    param([string]$directory)
 
+    # remove previous restores
+    Write-Log -Message "CleanUp(): Starting cleanup"
+    $folder_path = $directory.Substring(0,$directory.Length - 15) + "*"
+    $vm_prefix = Split-Path $folder_path -Leaf
+    Write-Log -Message "Clean up dir: $folder_path"
+    Write-Log -Message "Clean up vm prefix: $vm_prefix"
+
+    $vms = get-vm -name $vm_prefix|Sort-Object -Descending|Select-Object -Skip 1
     foreach ($vm in $vms)
     {
+        Write-Log -Message "Deleting VM $($vm.name)"
         Remove-VM -VM $vm -Force
-        $remove_dir = $restore_path + $vm.name
+        $remove_dir = (Split-Path $folder_path) + "\" + $vm.name
+        Write-Log -Message "Deleting folder $remove_dir"
         Remove-Item -Path $remove_dir -Recurse -Force
     }
 
     #remove orphaned folders
-    $folder_path = $restore_path + $vm_prefix 
     $folders = Get-Item $folder_path|Sort-Object -Descending -Property name|Select-Object -Skip 1
     foreach ($folder in $folders)
     {
+        Write-Log -Message "Deleting orphaned folder $folder"
         Remove-Item -Path $folder -Recurse -Force
     }
 }
 
 # Main()
-#.\run_replica_id.ps1
+#.\run_replica_id.ps1 -instance 416
 #.\run_replica_id.ps1 -RestoreOnly
-#.\run_replica_id.ps1 -ImportOnly -ImportPath "c:\vmtest\replica\ueb02_378_nano01_20181122_231813"
-#$vm_name = "ueb02_378_nano01_20181122_231813"
-#$directory = $restore_path + $vm_name
+#.\run_replica_id.ps1 -ImportOnly -Path "c:\vmtest\replica\ueb02_378_nano01_20181122_231813"
 
-Write-Log -Message "Main(): Start" -Init
 
-# Restore
-if($ImportOnly -eq $false) {
+$log = $restore_path + "logs/" + $instance
+if(Test-Path $log) {
+    if ((Get-Item $log).length -gt 500kb) {
+        Remove-Item $log
+    }
+}
+
+Write-Host "Starting..."
+Write-Host "Check log file: $log"
+
+Write-Log -Message "------------------------------------------------------------------------------------------------------------------ `n`n"
+Write-Log -Message "Main(): Start"
+
+
+if($ImportOnly) 
+{
+    $directory = $Path
+    Import $directory 
+} 
+elseif($RestoreOnly) 
+{
+    Restore
+} 
+elseif($CleanUpOnly)
+{
+    $directory = $Path
+    CleanUp $directory
+} 
+else {
     $directory = Restore
-} else {
-    $directory = $ImportPath
+    Import $directory 
+    CleanUp $directory
 }
 
-if($RestoreOnly -eq $true) { 
-    return
-}
 
-#Import
-Import $directory 
-
-if($ImportOnly -eq $true) { 
-    return
-}
-
-#CleanUp
-CleanUp
+Write-Log -Message "End(): Script Finished succesfully"
