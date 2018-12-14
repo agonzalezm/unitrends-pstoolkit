@@ -35,7 +35,7 @@ function Get-UebCatalog {
 			$asset_id = $o.client_id
 		}
 
-		$lastbackup = $o.backups | Sort-Object -Property start_date -Descending| Select-Object -First 1
+		$lastbackup = $o.backups | Sort-Object -Property id -Descending| Select-Object -First 1
 		$o | Add-Member -MemberType NoteProperty -Name last_backup_date -Value $lastbackup.start_date
 		$o | Add-Member -MemberType NoteProperty -Name last_backup_id -Value $lastbackup.id
 		$o | Add-Member -MemberType NoteProperty -Name asset -Value $asset
