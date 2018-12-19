@@ -15,7 +15,7 @@ $client_id=6
 $replica_name_prefix="customer1"
 $restore_path="C:/vmtest/replica/"
 $switch_name="test-vswitch"
-$replicas_n=1 					# number of additional replica VMs to keep, (default 1 will keep 2 VMs current and previous one)
+$replicas_n=1 					# number of replica VMs to keep, (default 1 will keep 1 VM copy only)
 #--- end of user settings ------
 
 # main code, dont modify
