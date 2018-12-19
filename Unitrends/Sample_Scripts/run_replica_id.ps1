@@ -2,7 +2,7 @@ param(
     $instance = 238,
     [switch] $RestoreOnly = $false,
     [switch] $ImportOnly = $false,
-    [string] $ImportPath
+    [string] $Path
 )
 
 #--- user settings ------
