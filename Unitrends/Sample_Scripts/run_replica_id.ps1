@@ -15,6 +15,7 @@ $client_id=6
 $replica_name_prefix="customer1"
 $restore_path="C:/vmtest/replica/"
 $switch_name="test-vswitch"
+$replicas_n=1 					# number of additional replica VMs to keep, (default 1 will keep 2 VMs current and previous one)
 #--- end of user settings ------
 
 # main code, dont modify
@@ -301,7 +302,7 @@ function CleanUp
     Write-Log -Message "Clean up dir: $folder_path"
     Write-Log -Message "Clean up vm prefix: $vm_prefix"
 
-    $vms = get-vm -name $vm_prefix|Sort-Object -Descending|Select-Object -Skip 1
+    $vms = get-vm -name $vm_prefix|Sort-Object -Descending|Select-Object -Skip $replicas_n
     foreach ($vm in $vms)
     {
         Write-Log -Message "Deleting VM $($vm.name)"
@@ -312,7 +313,7 @@ function CleanUp
     }
 
     #remove orphaned folders
-    $folders = Get-Item $folder_path|Sort-Object -Descending -Property name|Select-Object -Skip 1
+    $folders = Get-Item $folder_path|Sort-Object -Descending -Property name|Select-Object -Skip $replicas_n
     foreach ($folder in $folders)
     {
         Write-Log -Message "Deleting orphaned folder $folder"
