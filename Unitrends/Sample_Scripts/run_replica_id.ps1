@@ -1,22 +1,10 @@
 param(
-    $instance = 238,
+    $InstanceId,
+    [string] $ConfigFile,
     [switch] $RestoreOnly = $false,
     [switch] $ImportOnly = $false,
     [string] $Path
 )
-
-#--- user settings ------
-#ueb from where to restore backups
-$ueb = "ueb02"
-$user = "root"
-$pass = "password"
-#hyperv client to restore to replicas
-$client_id=6
-$replica_name_prefix="customer1"
-$restore_path="C:/vmtest/replica/"
-$switch_name="test-vswitch"
-$replicas_n=1 					# number of replica VMs to keep, (default 1 will keep 1 VM copy only)
-#--- end of user settings ------
 
 # main code, dont modify
 
@@ -321,10 +309,29 @@ function CleanUp
     }
 }
 
-# Main()
-#.\run_replica_id.ps1 -instance 416
+# Samples()
+#.\run_replica_id.ps1 -Instance 416
+#.\run_replica_id.ps1 -Instance 416 -ConfigFile c:\vmtest\config_for_ueb01.ps1
 #.\run_replica_id.ps1 -RestoreOnly
 #.\run_replica_id.ps1 -ImportOnly -Path "c:\vmtest\replica\ueb02_378_nano01_20181122_231813"
+
+$config_file = $ConfigFile
+
+if(!$config_file) {
+    $config_file= $global:PSScriptRoot + "\run_replica_id.config.ps1"
+}
+
+if(!(Test-Path $config_file))
+{
+    throw "Config file $config_file doesnt exists"
+}
+
+. $config_file
+
+if($InstanceId)
+{
+    $instance = $InstanceId
+}
 
 
 $log = $restore_path + "logs/" + $instance
@@ -337,9 +344,10 @@ if(Test-Path $log) {
 Write-Host "Starting..."
 Write-Host "Check log file: $log"
 
-Write-Log -Message "------------------------------------------------------------------------------------------------------------------ `n`n"
+Write-Log -Message "------------------------------------------------------------------------------------------------------------------ "
 Write-Log -Message "Main(): Start"
 
+Write-Log -Message "Using Config: `n ueb=$ueb `n user=$user `n pass=*** `n client_id=$client_id `n replica_name_prefix=$replica_name_prefix `n restore_path=$restore_path `n switch_name=$switch_name `n replicas_n=$replicas_n"
 
 if($ImportOnly) 
 {
