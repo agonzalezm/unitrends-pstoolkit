@@ -98,17 +98,38 @@ function Merge-VMDisks {
 
         if(!(Test-Path $vdisk_path)) {
             # the disk in the config file doesnt exists lets see if there is an autorevery disk and use it.
-            Write-Log -Message "The Disk '$($vdisk_path)' doesnt exist. Checking for -AutoRecovery disk..."
-	    
-	    if($vdisk_path.Contains(".avhdx")) { 
+            Write-Log -Message "The Disk '$($vdisk_path)' doesnt exist. Checking for vmdisk-AutoRecovery disk..."
+        
+            #if vdisk is not found check if there is vmdisk-autorecovery disk
+	        if($vdisk_path.Contains(".avhdx")) { 
                 $autorecovery_disk = $vdisk_path.Substring(0,$vdisk_path.Length - 43) + "-AutoRecovery.avhdx"
             } else { 
                 $autorecovery_disk = $vdisk_path.Substring(0,$vdisk_path.Length - 42) + "-AutoRecovery.avhd"
             }
             
+            #if no vmname-autorecovery disk is not found check if there is vmdisk-randomguid-autorecovery disk
+            if(!(Test-Path $autorecovery_disk)){
+                Write-Log -Message "The Disk '$($autorecovery_disk)' doesnt exist. Checking for vmdisk-randomguid-AutoRecovery disk..."
+
+                if($vdisk_path.Contains(".avhdx")) { 
+                    $vdisk_basename = $vdisk_path.Substring(0,$vdisk_path.Length - 43)
+                    $filter = $vdisk_basename + "*-Autorecovery.avhdx"                    
+                } else { 
+                    $vdisk_basename = $vdisk_path.Substring(0,$vdisk_path.Length - 42)
+                    $filter = $vdisk_basename + "*-Autorecovery.avhd"                    
+                }
+                $filter = Split-Path $filter -Leaf
+                
+                $dir_path = Split-Path $vdisk_path
+                $i = Get-ChildItem -Path $dir_path -Filter $filter
+                if($i) {
+                   $autorecovery_disk = $i.FullName
+                }      
+            }
+
             if(Test-Path $autorecovery_disk){
                 $vdisk_path = $autorecovery_disk
-		Write-Log -Message "AutoRecovery disk found, it will be used for merge ..."
+		        Write-Log -Message "AutoRecovery disk found, it will be used for merge ($vdisk_path)..."
             } else {
                 throw "The disk used in config file $vdisk_path or $autorecovery_disk doesnt exists. Cant continue."
             }
@@ -239,10 +260,31 @@ function Import
 
     $vm_config = $directory + "\config\" + $vm_config
 
-    sleep 5
+    #Start-Sleep 5
 
     Write-Log -Message "Running Compare-VM..."
-    $report = Compare-VM  -Path $vm_config -Register
+    $retrycount = 0
+    $completed = $false
+    $secondsDelay = 2
+    $retries = 5
+
+    while (-not $completed) {
+        try {
+            $report = Compare-VM -Path $vm_config -Register
+            Write-Log -Message "Command Compare-VM succeeded."
+            $completed = $true
+        } catch {
+            if ($retrycount -ge $retries) {
+                Write-Log -Message "Command Compare-VM failed the maximum number of $retrycount times."
+                throw
+            } else {
+                Write-Log -Message "Command Compare-VM failed. Retrying in $secondsDelay seconds."
+                Start-Sleep $secondsDelay
+                $retrycount++
+            }
+        }
+    }
+
     Write-Log -Message "Compare-VM Incompatibilities that we need to fix: $($report.Incompatibilities|Out-String)"
     Write-Log -Message "Fixing VMSavedState"
     $report.VM|Remove-VMSavedState -ErrorAction Ignore
@@ -318,12 +360,13 @@ function CleanUp
 $config_file = $ConfigFile
 
 if(!$config_file) {
-    $config_file= $global:PSScriptRoot + "\run_replica_id.config.ps1"
+    $config_file= "$PSScriptRoot\run_replica_id.config.ps1"
 }
 
 if(!(Test-Path $config_file))
 {
-    throw "Config file $config_file doesnt exists"
+    Write-HOST "[ERROR] Config file $config_file doesnt exists"
+    exit 1
 }
 
 . $config_file
