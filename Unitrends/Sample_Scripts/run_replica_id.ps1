@@ -226,7 +226,7 @@ function Import
     }
 
     New-Item -ItemType Directory -Force -Path "$directory/config" | Out-Null
-    $files = Get-ChildItem -Path $directory_temp -Recurse -include *.xml,*.preCheckpointCopy,*.vmrs | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
+    $files = Get-ChildItem -Path $directory_temp -Recurse -include *.xml,*.preCheckpointCopy | Where-Object { $_.DirectoryName.EndsWith("Virtual Machines")}
     foreach($file in $files)
     {
         Copy-Item -Path $file.FullName -Destination "$directory/config"
@@ -249,9 +249,8 @@ function Import
         $vm_config = $new_guid + ".vmcx"
         $new_vmrs = $new_guid + ".vmrs"
         Remove-Item -Path "$directory\config\*.vmcx"
-        Rename-Item  $vmcx -NewName $vm_config
-        $vmrs = Get-Item -Path "$directory\config\*.vmrs"
-        Rename-Item  $vmrs -NewName $new_vmrs
+        Copy-Item -Path $vmcx -Destination "$directory\config\$vm_config" -Force 
+        Copy-Item -Path "$restore_path\empty_vmrs" -Destination "$directory\config\$new_vmrs" -Force
     } else  {
         $vm_config = $new_guid + ".xml"
         $xml = Get-Item -Path "$directory\config\*.xml"
@@ -292,6 +291,15 @@ function Import
     $report.VM|rename-vm -NewName $vm_name
     Write-Log -Message "Configuring all networks to $switch_name"
     $report.VM|Get-VMNetworkAdapter | Connect-VMNetworkAdapter -SwitchName $switch_name
+    $mem=$report.vm|Get-VMMemory
+    $mem=$mem.Startup/1gb
+    Write-Log -Message "Memory size: $mem GB"
+    if( $mem -gt $max_vm_mem_gb )
+    {
+        Write-Log -Message "Memory size is too large: $mem GB, setting it to $max_vm_mem_gb GB"
+        $report.vm|set-vmmemory -StartupBytes $($max_vm_mem_gb*1GB)
+    }
+    
 
     # wait 3 secs to saved state to be removed
     Sleep 5
