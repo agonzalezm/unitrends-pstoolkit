@@ -159,6 +159,7 @@ function Restore {
     $backup_date = [datetime]::Parse($catalog.last_backup_date).ToString("yyyyMMdd_HHmmss")
     $backup_id = $catalog.last_backup_id
     $vm_name = $replica_name_prefix + "_" + $catalog.asset_id + "_" + $catalog.asset + "_" + $backup_date
+    $vm_name = $vm_name -replace " ","_"
     $directory = $restore_path + $vm_name
     $directory = $directory -replace " ","_"
     $directory_temp = $directory + "\unitrends_restore"
