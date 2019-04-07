@@ -16,28 +16,24 @@ function Get-UebInventory {
 	
 	foreach( $node in $nodes)
 	{
-		if($node.type -eq "VMware") #VMware
-		{	
-			foreach( $vm in $node.children)
-			{
-				$vm |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
-				$vms += $vm
-			}
-		} elseif($node.type -eq "Windows") #Windows
-		{
-			$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
-			$vms += $node
+		$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+		$vms += $node
 
-			foreach( $subnode in $node.children)
-			{
-				$subnode |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
-				$vms += $subnode
-			}		
-		} elseif($node.type -eq "Linux") #Linux
+		foreach( $subnode in $node.children)
 		{
-			$node |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
-			$vms += $node
-		}
+			$subnode |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+			$vms += $subnode
+
+			foreach( $subnode2 in $subnode.children)
+			{
+				$subnode2 |Add-Member -MemberType NoteProperty -Name "server" -Value $node.name
+				$vms += $subnode2
+			}		
+	
+		}		
+
+
+
 	}
 	
 	if($Name) {

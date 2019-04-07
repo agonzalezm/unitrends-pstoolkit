@@ -4,18 +4,20 @@ function Get-UebCatalog {
 		[Parameter(Mandatory=$false)]
 		[string] $Name,
 		[Parameter(Mandatory=$false)]
-		[string] $InstanceId
-
+		[string] $InstanceId,
+		[Parameter(Mandatory=$false)]
+		[int] $Days=30
 	)
 
 	CheckConnection
-	$StartDate = (Get-Date).AddDays(-30).ToString("MM/dd/yyyy")
+	$StartDate = (Get-Date).AddDays(-$Days).ToString("MM/dd/yyyy")
+
 	if($InstanceId)
 	{
-		$api_iid = "&iid=" + $InstanceId
+		$iid_param = "&iid=" + $InstanceId
 	}
 
-	$response = UebGet("api/catalog/?start_date=" + $StartDate + $api_iid)
+	$response = UebGet("api/catalog/?start_date=" + $StartDate + $iid_param)
 	
 
 	$instances = $response.catalog.instances
