@@ -5,7 +5,8 @@ param(
     [string] $source_database="servidor\SQLEXPRESS\master",      # Instancia de Base de Datos Origen a restaurar
     [string] $target_database_name="master_recover",             # Nombre con el que restaurar la Base de Datos
     [string] $target_server="servidor_destino",                             # Equipo Destino del Restore
-    [string] $target_directory="C:\SQL\DATA"                     # Directorio a Restaurar   
+    [string] $target_directory="C:\SQL\DATA",                     # Directorio a Restaurar   
+	[string] $target_directory_log="c:\SQL\logs"				# Directori donde mover los logs
 )
 
 function Write-Error($message) {
@@ -74,4 +75,48 @@ if ($target_sql_instance_name -eq $null ) {
 Write-Host "`r`n[2] Lanzando comando de restore:"
 Write-Host "      Start-UebRestoreSql -backupID $last_backup_id -clientID $target_client_id -instance_name $target_sql_instance_name -database $target_database_name -directory $target_directory"
 Write-Host ""
-Start-UebRestoreSql -backupID $last_backup_id -clientID $target_client_id -instance_name $target_sql_instance_name -database $target_database_name -directory $target_directory
+$restore = Start-UebRestoreSql -backupID $last_backup_id -clientID $target_client_id -instance_name $target_sql_instance_name -database $target_database_name -directory $target_directory
+$restore_id = $restore.id
+
+Write-Host "`r`n[3] Esperando que termine el restore ($restore_id):"
+
+$restore_job = $null
+while($restore_job -eq $null) {
+    $restore_job = get-uebjob -Active|Where-Object {$_.id -eq $restore_id}
+    Sleep 3
+}
+
+while($restore_job.status -eq "Queued" -or $restore_job.status -eq "Active" -or $restore_job.status -eq "Connecting")
+{
+    $restore_job = get-uebjob -Active|Where-Object {$_.id -eq $restore_id}
+    Sleep 3
+}
+
+
+Write-Host "`r`n[3] Obteniendo fichero de log:"
+
+$log_name = $source_database.split('\')[-1] + "_log"
+$log_file=Get-ChildItem -Path $target_directory -Recurse -Include *.ldf
+if($log_file.count -gt 1)
+{
+    Write-Error "   Se han encontrado mas de 1 log, no esta soportado mover mas de 1 logfile"
+}
+$log_filename=$log_file.Name
+
+Write-Host "`r`n[4] Modificando database log:"
+Write-Host "`r`n      sqlcmd -S $target_sql_instance_name -Q 'ALTER DATABASE [$target_database_name] MODIFY FILE (name='$log_name',filename='$target_directory_log\$log_filename'); ALTER DATABASE [$target_database_name] SET OFFLINE WITH ROLLBACK IMMEDIATE;'"
+sqlcmd -S $target_sql_instance_name -Q "ALTER DATABASE [$target_database_name] MODIFY FILE (name='$log_name',filename='$target_directory_log\$log_filename');"
+sqlcmd -S $target_sql_instance_name -Q "ALTER DATABASE [$target_database_name] SET OFFLINE;"
+
+Write-Host "`r`n      Move-Item -Path $logfile -Destination $target_directory_log"
+if(Test-Path -Path $target_directory_log\$log_filename )
+{
+    Remove-Item -Path $target_directory_log\$log_filename 
+}
+
+Move-Item -Path $log_file -Destination $target_directory_log
+
+Write-Host "`r`n[5] Reiniciando database:"
+Write-Host "`r`n      sqlcmd -S $target_sql_instance_name -Q  'ALTER DATABASE [$target_database_name] SET ONLINE;'"
+sqlcmd -S $target_sql_instance_name -Q  "ALTER DATABASE [$target_database_name] SET ONLINE;" 
+Write-Host "`r`n[6] Finalizado correctamente."
