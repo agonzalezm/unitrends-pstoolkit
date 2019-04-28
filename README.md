@@ -5,18 +5,18 @@ Chat Room
 
 Want to chat with other members of the Unitrends community?
 
-[![Join the chat at https://gitter.im/Unitrends/unitrends-pstoolkit](https://badges.gitter.im/Unitrends/unitrends-pstoolkit.svg)](https://gitter.im/Unitrends/unitrends-pstoolkit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/Unitrends/unitrends-pstoolkit](https://badges.gitter.im/Unitrends/unitrends-pstoolkit.svg)](https://gitter.im/agonzalezm/unitrends-pstoolkit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Engage, Contribute and Provide Feedback
 ---------------------------------------
 
 Some of the best ways to contribute are to try things out, file bugs, and join in gitter conversations. You are encouraged to start a discussion by filing an issue. 
 
-Looking for something to work on? The list of [issues](https://github.com/Unitrends/unitrends-pstoolkit/issues) is a great place to start.
+Looking for something to work on? The list of [issues](https://github.com/agonzalezm/unitrends-pstoolkit/issues) is a great place to start.
 
 **Request new features or report bugs:**
 
-1. Open github [issue](https://github.com/Unitrends/unitrends-pstoolkit/issues)
+1. Open github [issue](https://github.com/agonzalezm/unitrends-pstoolkit/issues)
 
 Requirements
 ---------------------------------------
@@ -32,7 +32,7 @@ Download and getting started
 Open Administrator Powershell Console:
 
     PS> Set-ExecutionPolicy Bypass
-    PS> iwr https://raw.githubusercontent.com/Unitrends/unitrends-pstoolkit/master/Unitrends/Install.ps1 | iex
+    PS> iwr https://raw.githubusercontent.com/agonzalezm/unitrends-pstoolkit/master/Unitrends/Install.ps1 | iex
 
 **Usage:**
 
