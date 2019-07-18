@@ -2,11 +2,17 @@
 
 param(
     [Parameter(Mandatory=$false,ValueFromPipelineByPropertyName=$true)]
-    [string] $source_database="servidor\SQLEXPRESS\master",      # Instancia de Base de Datos Origen a restaurar
-    [string] $target_database_name="master_recover",             # Nombre con el que restaurar la Base de Datos
-    [string] $target_server="servidor_destino",                             # Equipo Destino del Restore
-    [string] $target_directory="C:\SQL\DATA",                     # Directorio a Restaurar   
-	[string] $target_directory_log="c:\SQL\logs"				# Directori donde mover los logs
+    [int] $source_database_iid=2052,
+    [string] $source_database="DC1PVDBUC3\PRDBUC2\AXA_RS",      # Instancia de Base de Datos Origen a restaurar
+    [string] $target_database_name="AXA_RS",             # Nombre con el que restaurar la Base de Datos
+    [string] $target_server="DC2TVDSQL16",                             # Equipo Destino del Restore
+    [string] $target_directory="E:\Data\Restore",                     # Directorio a Restaurar   
+    [string] $target_directory_log="F:\Log",				# Directori donde mover los logs
+    [string] $target_sql_instance_name=$null,           # sql instance name or null for get the first one
+    # UEB LOGIN
+    [string] $Server="192.168.1.130",
+    [string] $User="root",
+    [string] $Password="pass"
 )
 
 function Write-Error($message) {
@@ -19,10 +25,11 @@ function Write-Error($message) {
 
 ##############################################################
 # LOGIN
-Write-Host "`r`n[1] Obteniendo parametros para el restore"
+Write-Host "`r`n[1] Autenticando con el appliance"
 
 try
 {
+    Connect-UebServer -Server $Server -User $User -Password $Password | Out-Null
     Get-UebApi -uri "/api/summary/current" | Out-Null
 }
 catch
@@ -34,7 +41,7 @@ catch
 ##############################################################
 # BUSQUEDA DEL ULTIMO BACKUP
 
-$source_database_iid = (Get-UebInventory -name $source_database).id
+#$source_database_iid = (Get-UebInventory -name $source_database).id
 Write-Host "      source_database_iid=$source_database_iid"
 
 try {
@@ -61,12 +68,16 @@ if ($target_client_id -eq $null) {
 ##############################################################
 # BUSQUEDA DEL INSTANCE DE DESTINO  
 
-$target_sql_instance_name = (get-uebapi -uri "/api/restore/targets/?app_type=SQL+Server&bid=$last_backup_id&iid=$source_database_iid&replicated=0&sid=1&targetID=$target_client_id").instances.instance_name | Select-Object -First 1
-Write-Host "      target_sql_instance_name=$target_sql_instance_name"
-
 if ($target_sql_instance_name -eq $null ) {
-    Write-Error "No existe un instancia de SQL en el servidor $target_server compatible con el backup de $source_database " 
-    exit 1
+    $target_sql_instance_name = (get-uebapi -uri "/api/restore/targets/?app_type=SQL+Server&bid=$last_backup_id&iid=$source_database_iid&replicated=0&sid=1&targetID=$target_client_id").instances.instance_name | Select-Object -First 1
+    Write-Host "      target_sql_instance_name=$target_sql_instance_name"
+
+    if ($target_sql_instance_name -eq $null ) {
+        Write-Error "No existe un instancia de SQL en el servidor $target_server compatible con el backup de $source_database " 
+        exit 1
+    }
+} else {
+    Write-Host "      target_sql_instance_name=$target_sql_instance_name"
 }
 
 ##############################################################
